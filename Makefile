@@ -1,13 +1,15 @@
 export DEBUG=0
 export FINALPACKAGE=1
-export THEOS=/opt/theos
 
-//make clean && make package SCHEME=rootless
+# 只在 THEOS 未定义时赋值，避免 make 误判
+ifndef THEOS
+THEOS := $(CURDIR)/theos
+endif
 
 # 项目名称
 TWEAK_NAME = WeChatEnhance
 
-# 根据 SCHEME 变量的值设置 Theos 包的方案和安装路径。
+# 根据 SCHEME 变量的值设置 Theos 包的方案和安装路径
 ifeq ($(SCHEME),roothide)
     export THEOS_PACKAGE_SCHEME = roothide
 else ifeq ($(SCHEME),rootless)
@@ -28,17 +30,17 @@ WeChatEnhance_FILES = $(wildcard Hooks/*.xm) \
 WeChatEnhance_CFLAGS = -fobjc-arc \
                        -I$(THEOS_PROJECT_DIR)/Headers \
                        -I$(THEOS_PROJECT_DIR)/Hooks \
-                       -Wno-error \
+                       -Wno-error 
 
 # 框架依赖
 WeChatEnhance_FRAMEWORKS = UIKit Foundation LocalAuthentication
 
 # 包含 Theos make 系统
 include $(THEOS)/makefiles/common.mk
-include $(THEOS_MAKE_PATH)/tweak.mk
+include $(THEOS)/makefiles/tweak.mk
 
 clean::
-	@echo -e "\033[31m==>\033[0m 正在清理......"
+	@echo -e "\033[31m==>\033[0m 正在清理……"
 	@rm -rf .theos packages
 
 after-package::
